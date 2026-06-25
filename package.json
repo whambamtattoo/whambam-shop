@@ -1,0 +1,13 @@
+{
+  "name": "whambam-shop",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "next": "14.0.0",
+    "stripe": "^14.0.0"
+  }
+}
