@@ -1,7 +1,9 @@
 import Stripe from 'stripe'
 import { products } from '../../lib/products'
+import { createClient } from '@supabase/supabase-js'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SECRET_KEY)
 
 const SHIPPING_RATES = {
   uk_free: process.env.STRIPE_SHIPPING_UK_FREE,
@@ -41,10 +43,22 @@ export default async function handler(req, res) {
       const variant = product.variants.find(v => v.id === cartItem.variantId)
       if (!variant) continue
 
-      if (product.category === 'voucher') {
-        hasVouchers = true
-      } else {
+      // Check stock for tees (not vouchers)
+      if (product.category === 'tee') {
+        const { data: stockData } = await supabase
+          .from('stock')
+          .select('quantity')
+          .eq('id', `${cartItem.productId}-${cartItem.variantId}`)
+          .single()
+
+        if (!stockData || stockData.quantity < cartItem.quantity) {
+          return res.status(400).json({ 
+            error: `Sorry, ${product.name} (${variant.label}) is out of stock.` 
+          })
+        }
         hasPhysicalItems = true
+      } else {
+        hasVouchers = true
       }
 
       let itemName = product.name
@@ -89,7 +103,8 @@ export default async function handler(req, res) {
       success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/shop?success=true`,
       cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/shop?cancelled=true`,
       metadata: {
-        source: 'whambamtattoo.com'
+        source: 'whambamtattoo.com',
+        items: JSON.stringify(items)
       }
     })
 
