@@ -46,6 +46,17 @@ export default async function handler(req, res) {
 
     const data = await googleRes.json();
 
+    // TEMPORARY DEBUG MODE — visit the URL with ?debug=1 on the end to see
+    // exactly what Google sent back, before any filtering happens.
+    if (req.query.debug) {
+      res.status(200).json({
+        rawReviewsFromGoogle: data.reviews ?? "MISSING - Google did not return a reviews field at all",
+        fullResponseKeys: Object.keys(data),
+      });
+      return;
+    }
+
+    // Trim to just what the widget needs, and only 4-5★ reviews with actual text.
     const reviews = (data.reviews ?? [])
       .filter((r) => r.text?.text && r.rating >= 4)
       .map((r) => ({
@@ -57,6 +68,8 @@ export default async function handler(req, res) {
         profileUrl: r.authorAttribution?.uri ?? null,
       }));
 
+    // Cache for 6 hours at the edge — reviews don't change often, and this
+    // keeps you well within the free monthly Google API quota.
     res.setHeader("Cache-Control", "s-maxage=21600, stale-while-revalidate=43200");
 
     res.status(200).json({
