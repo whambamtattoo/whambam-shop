@@ -100,8 +100,4 @@ export default async function handler(req, res) {
   }
 
   return res.status(200).json({ received: true })
-}    }
-  }
-
-  return res.status(200).json({ received: true })
 }
