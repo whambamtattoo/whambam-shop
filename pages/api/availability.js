@@ -12,7 +12,6 @@ export default async function handler(req, res) {
   }
 
   const { date } = req.query;
-
   if (!date) {
     return res.status(400).json({ error: 'Date is required' });
   }
@@ -21,7 +20,7 @@ export default async function handler(req, res) {
   const timeMax = new Date(`${date}T23:59:59`).toISOString();
 
   try {
-    const busy = await getBusyTimes(CALENDAR_IDS, timeMin, timeMax);
+    const busy = await getBusyTimes(CALENDAR_IDS, timeMin, timeMax, true);
     res.status(200).json({ date, busy });
   } catch (err) {
     res.status(500).json({ error: err.message });
