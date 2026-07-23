@@ -20,7 +20,7 @@ export default async function handler(req, res) {
   const timeMax = new Date(`${date}T23:59:59`).toISOString();
 
   try {
-    const busy = await getBusyTimes(CALENDAR_IDS, timeMin, timeMax, true);
+    const busy = await getBusyTimes(CALENDAR_IDS, timeMin, timeMax);
     res.status(200).json({ date, busy });
   } catch (err) {
     res.status(500).json({ error: err.message });
