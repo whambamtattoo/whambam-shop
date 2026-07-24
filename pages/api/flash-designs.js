@@ -12,7 +12,7 @@ export default async function handler(req, res) {
   try {
     const { data, error } = await supabase
       .from('flash_designs')
-      .select('id, image_url, subject, size, duration_minutes')
+      .select('id, image_url, subject, size, duration_minutes, price')
       .eq('featured', true)
       .eq('available', true);
 
