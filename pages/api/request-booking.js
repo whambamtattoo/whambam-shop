@@ -24,7 +24,14 @@ export default async function handler(req, res) {
     slotTime,
   } = req.body;
 
-  const subject = `New booking request: ${fullName} — ${slotDate} ${slotTime}`;
+  const formattedDate = new Date(`${slotDate}T00:00:00`).toLocaleDateString('en-GB', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
+
+  const subject = `New booking request: ${fullName} — ${formattedDate} ${slotTime}`;
 
   const text = `
 New flash booking request
@@ -39,7 +46,7 @@ Size: ${size || '-'}
 Price: ${price || '-'}
 Approx duration: ${duration || '-'}
 
-Requested date: ${slotDate || '-'}
+Requested date: ${formattedDate}
 Requested time: ${slotTime || '-'}
   `.trim();
 
@@ -56,7 +63,7 @@ Requested time: ${slotTime || '-'}
           <strong>Size:</strong> ${size || '-'}<br>
           <strong>Price:</strong> ${price || '-'}<br>
           <strong>Approx duration:</strong> ${duration || '-'}<br>
-          <strong>Requested date:</strong> ${slotDate || '-'}<br>
+          <strong>Requested date:</strong> ${formattedDate}<br>
           <strong>Requested time:</strong> ${slotTime || '-'}
         </div>
       </div>
@@ -72,6 +79,24 @@ Requested time: ${slotTime || '-'}
       },
       body: JSON.stringify({
         from: process.env.FROM_EMAIL,
+        to: process.env.NOTIFICATION_EMAIL,
+        subject,
+        text,
+        html,
+        reply_to: email || undefined,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Resend API error: ${response.status} ${errorText}`);
+    }
+
+    res.status(200).json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+}        from: process.env.FROM_EMAIL,
         to: process.env.NOTIFICATION_EMAIL,
         subject,
         text,
