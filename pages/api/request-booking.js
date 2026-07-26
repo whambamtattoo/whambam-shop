@@ -15,7 +15,9 @@ export default async function handler(req, res) {
     fullName,
     email,
     phone,
-    location,
+    placement,
+    colourPreference,
+    notes,
     flashSubject,
     size,
     price,
@@ -39,7 +41,8 @@ New flash booking request
 Name: ${fullName || '-'}
 Email: ${email || '-'}
 Phone: ${phone || '-'}
-Location: ${location || '-'}
+Placement: ${placement || '-'}
+Colour preference: ${colourPreference || '-'}
 
 Design: ${flashSubject || '-'}
 Size: ${size || '-'}
@@ -48,6 +51,9 @@ Approx duration: ${duration || '-'}
 
 Requested date: ${formattedDate}
 Requested time: ${slotTime || '-'}
+
+Additional notes:
+${notes || '-'}
   `.trim();
 
   const html = `
@@ -58,12 +64,19 @@ Requested time: ${slotTime || '-'}
           <strong>Name:</strong> ${fullName || '-'}<br>
           <strong>Email:</strong> <a href="mailto:${email || ''}">${email || '-'}</a><br>
           <strong>Phone:</strong> ${phone || '-'}<br>
-          <strong>Location:</strong> ${location || '-'}<br>
+          <strong>Placement:</strong> ${placement || '-'}<br>
+          <strong>Colour preference:</strong> ${colourPreference || '-'}<br>
           <strong>Design:</strong> ${flashSubject || '-'}<br>
           <strong>Size:</strong> ${size || '-'}<br>
           <strong>Price:</strong> ${price || '-'}<br>
           <strong>Requested date:</strong> ${formattedDate}<br>
           <strong>Requested time:</strong> ${slotTime || '-'}
+        </div>
+        <div style="margin:20px 0;">
+          <strong style="display:block; margin-bottom:8px; color:#111111;">Additional notes:</strong>
+          <div style="padding:16px; border:1px solid #eeeeee; border-radius:12px; background:#fafafa; color:#222222; line-height:1.7;">
+            ${(notes || '-').replace(/\n/g, '<br>')}
+          </div>
         </div>
       </div>
     </div>
