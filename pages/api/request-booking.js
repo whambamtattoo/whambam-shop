@@ -1,3 +1,7 @@
+import { createClient } from '@supabase/supabase-js';
+
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SECRET_KEY);
+
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -26,12 +30,42 @@ export default async function handler(req, res) {
     slotTime,
   } = req.body;
 
+  let bookingId;
+
+  try {
+    const { data, error } = await supabase
+      .from('bookings')
+      .insert({
+        full_name: fullName,
+        email,
+        phone,
+        location: 'London',
+        tattoo_idea: `Flash design: ${flashSubject || ''}`,
+        size,
+        budget: price,
+        flash_design_ref: flashSubject || null,
+        slot_date: slotDate,
+        slot_time: slotTime,
+        deposit_amount: 100,
+        status: 'requested',
+      })
+      .select('id')
+      .single();
+
+    if (error) throw error;
+    bookingId = data.id;
+  } catch (err) {
+    return res.status(500).json({ error: `Booking save failed: ${err.message}` });
+  }
+
   const formattedDate = new Date(`${slotDate}T00:00:00`).toLocaleDateString('en-GB', {
     weekday: 'long',
     day: 'numeric',
     month: 'long',
     year: 'numeric',
   });
+
+  const confirmUrl = `https://whambam-shop.vercel.app/api/confirm-booking?id=${bookingId}`;
 
   const subject = `New booking request: ${fullName} — ${formattedDate} ${slotTime}`;
 
@@ -54,6 +88,9 @@ Requested time: ${slotTime || '-'}
 
 Additional notes:
 ${notes || '-'}
+
+Confirm and send payment link:
+${confirmUrl}
   `.trim();
 
   const html = `
@@ -78,6 +115,9 @@ ${notes || '-'}
             ${(notes || '-').replace(/\n/g, '<br>')}
           </div>
         </div>
+        <a href="${confirmUrl}" style="display:inline-block; margin-top:12px; background:#000; color:#fff; padding:14px 24px; border-radius:6px; text-decoration:none; font-weight:bold;">
+          Confirm & send payment link
+        </a>
       </div>
     </div>
   `;
