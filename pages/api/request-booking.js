@@ -131,7 +131,7 @@ ${confirmUrl}
       },
       body: JSON.stringify({
         from: process.env.FROM_EMAIL,
-        to: process.env.NOTIFICATION_EMAIL,
+        to: process.env.BOOKING_REQUEST_NOTIFY_EMAIL,
         subject,
         text,
         html,
