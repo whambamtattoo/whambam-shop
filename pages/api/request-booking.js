@@ -62,7 +62,6 @@ Requested time: ${slotTime || '-'}
           <strong>Design:</strong> ${flashSubject || '-'}<br>
           <strong>Size:</strong> ${size || '-'}<br>
           <strong>Price:</strong> ${price || '-'}<br>
-          <strong>Approx duration:</strong> ${duration || '-'}<br>
           <strong>Requested date:</strong> ${formattedDate}<br>
           <strong>Requested time:</strong> ${slotTime || '-'}
         </div>
@@ -79,24 +78,6 @@ Requested time: ${slotTime || '-'}
       },
       body: JSON.stringify({
         from: process.env.FROM_EMAIL,
-        to: process.env.NOTIFICATION_EMAIL,
-        subject,
-        text,
-        html,
-        reply_to: email || undefined,
-      }),
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Resend API error: ${response.status} ${errorText}`);
-    }
-
-    res.status(200).json({ success: true });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-}        from: process.env.FROM_EMAIL,
         to: process.env.NOTIFICATION_EMAIL,
         subject,
         text,
