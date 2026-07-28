@@ -101,7 +101,7 @@ export default async function handler(req, res) {
       },
       shipping_options: shippingOptions,
       success_url: `https://whambamtattoo.com/shop?success=true`,
-cancel_url: `https://whambamtattoo.com/shop?cancelled=true`,
+      cancel_url: `https://whambamtattoo.com/shop?cancelled=true`,
       metadata: {
         source: 'whambamtattoo.com',
         items: JSON.stringify(items)
