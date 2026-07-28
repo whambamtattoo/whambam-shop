@@ -1,53 +1,125 @@
-import Head from 'next/head';
+import Stripe from 'stripe';
+import { createClient } from '@supabase/supabase-js';
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SECRET_KEY);
+export default async function handler(req, res) {
+  const { id } = req.query;
+  if (!id) {
+    return res.status(400).send('Missing booking id');
+  }
+  try {
+    console.log('STEP 1: fetching booking', id);
+    const { data: booking, error } = await supabase
+      .from('bookings')
+      .select('*')
+      .eq('id', id)
+      .single();
+    if (error || !booking) {
+      return res.status(404).send('Booking not found');
+    }
+    console.log('STEP 2: booking fetched', booking.status);
 
-export default function BookingConfirmed() {
-  return (
-    <>
-      <Head>
-        <link
-          href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap"
-          rel="stylesheet"
-        />
-      </Head>
-      <div style={{
-        background: '#f5f5f5',
-        minHeight: '100vh',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        fontFamily: 'Arial, sans-serif',
-        padding: '32px',
-      }}>
-        <div style={{
-          maxWidth: '480px',
-          background: '#fff',
-          borderRadius: '16px',
-          padding: '40px',
-          border: '1px solid #eaeaea',
-          textAlign: 'center',
-        }}>
-          <h1 style={{
-            color: '#111',
-            marginTop: 0,
-            fontFamily: '"Bebas Neue", sans-serif',
-            letterSpacing: '1px',
-            fontSize: '42px',
-            textTransform: 'uppercase',
-          }}>
-            You&apos;re all booked in!
-          </h1>
-          <p style={{ color: '#222', lineHeight: 1.6 }}>
-            Your deposit has been received and your slot is confirmed.
-            You&apos;ll get a confirmation email shortly with all the details.
+    if (booking.status !== 'requested') {
+      res.setHeader('Content-Type', 'text/html');
+      return res.status(200).send(`
+        <html>
+          <body style="font-family: Arial, sans-serif; text-align: center; padding: 60px;">
+            <h2>This booking has already been confirmed</h2>
+            <p>${booking.full_name} — ${booking.email}</p>
+          </body>
+        </html>
+      `);
+    }
+
+    console.log('STEP 3: creating Stripe session');
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      mode: 'payment',
+      line_items: [
+        {
+          price_data: {
+            currency: 'gbp',
+            product_data: { name: 'Tattoo Booking Deposit' },
+            unit_amount: 10000,
+          },
+          quantity: 1,
+        },
+      ],
+      metadata: {
+        type: 'booking',
+        fullName: booking.full_name,
+        email: booking.email,
+        phone: booking.phone || '',
+        location: booking.location || '',
+        tattooIdea: booking.tattoo_idea || '',
+        size: booking.size || '',
+        budget: booking.budget || '',
+        flashDesignRef: booking.flash_design_ref || '',
+        slotDate: booking.slot_date,
+        slotTime: booking.slot_time,
+        bookingId: String(booking.id),
+      },
+      success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/booking-confirmed`,
+      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/book`,
+    });
+    console.log('STEP 4: Stripe session created', session.id);
+
+    await supabase
+      .from('bookings')
+      .update({ status: 'awaiting_deposit', stripe_payment_id: session.id })
+      .eq('id', id);
+    console.log('STEP 5: Supabase updated');
+
+    const emailHtml = `
+      <div style="background:#f5f5f5; padding:32px; font-family:Arial, sans-serif;">
+        <div style="max-width:640px; margin:0 auto; background:#ffffff; border-radius:16px; padding:28px; border:1px solid #eaeaea;">
+          <h2 style="margin-top:0; color:#111111;">YOUR BOOKING IS READY TO CONFIRM</h2>
+          <p style="color:#222222;">Hi ${booking.full_name},</p>
+          <p style="color:#222222;">
+            Great news — your flash booking request has been approved. To lock in your slot, please pay the £100 deposit using the link below.
           </p>
-          <p style={{ color: '#222', lineHeight: 1.6 }}>
-            Need to change anything? Just reply to that email and we&apos;ll sort it out.
+          <a href="${session.url}" style="display:inline-block; margin-top:12px; background:#000; color:#fff; padding:14px 24px; border-radius:6px; text-decoration:none; font-weight:bold;">
+            Pay £100 deposit
+          </a>
+          <p style="color:#222222; margin-top:24px;">
+            Once paid, your booking will be fully confirmed. Any questions, just reply to this email.
           </p>
-          <p style={{ marginTop: '24px', color: '#222' }}>
-            See you soon,<br />Andy
-          </p>
+          <p style="margin-top:24px; color:#222222;">Cheers,<br>Andy</p>
         </div>
       </div>
-    </>
-  );
+    `;
+    console.log('STEP 6: sending Resend email');
+    const emailRes = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        from: process.env.FROM_EMAIL,
+        to: booking.email,
+        subject: 'Your booking is ready — pay your deposit to confirm',
+        html: emailHtml,
+        reply_to: process.env.NOTIFICATION_EMAIL,
+      }),
+    });
+    console.log('STEP 7: Resend response status', emailRes.status);
+    if (!emailRes.ok) {
+      const errText = await emailRes.text();
+      throw new Error(`Resend error: ${errText}`);
+    }
+    console.log('STEP 8: done, sending success page');
+    res.setHeader('Content-Type', 'text/html');
+    res.status(200).send(`
+      <html>
+        <body style="font-family: Arial, sans-serif; text-align: center; padding: 60px;">
+          <h2>Payment link sent to ${booking.full_name}</h2>
+          <p>${booking.email}</p>
+        </body>
+      </html>
+    `);
+  } catch (err) {
+    console.error('CONFIRM-BOOKING ERROR:', err);
+    res.status(500).send(`Error: ${err.message}`);
+  }
 }
