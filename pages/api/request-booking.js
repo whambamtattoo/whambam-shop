@@ -97,7 +97,7 @@ ${confirmUrl}
   const html = `
     <div style="background:#f5f5f5; padding:32px; font-family:Arial, sans-serif;">
       <div style="max-width:640px; margin:0 auto; background:#ffffff; border-radius:16px; padding:28px; border:1px solid #eaeaea;">
-        <h2 style="margin-top:0; color:#111111;">New flash booking request</h2>
+        <h2 style="margin-top:0; color:#111111; text-transform:uppercase;">New flash booking request</h2>
         ${imageUrl ? `<img src="${imageUrl}" alt="Flash design" style="max-width:220px; border-radius:8px; margin-bottom:16px; display:block;">` : ""}
         <div style="margin:20px 0; padding:16px; border:1px solid #eeeeee; border-radius:12px; background:#fafafa; color:#222222; line-height:1.8;">
           <strong>Name:</strong> ${fullName || '-'}<br>
