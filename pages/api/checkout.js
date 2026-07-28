@@ -32,7 +32,6 @@ export default async function handler(req, res) {
       if (!product) continue
       const variant = product.variants.find(v => v.id === cartItem.variantId)
       if (!variant) continue
-      // Check stock for tees (not vouchers)
       if (product.category === 'tee') {
         const { data: stockData } = await supabase
           .from('stock')
@@ -40,8 +39,8 @@ export default async function handler(req, res) {
           .eq('id', `${cartItem.productId}-${cartItem.variantId}`)
           .single()
         if (!stockData || stockData.quantity < cartItem.quantity) {
-          return res.status(400).json({ 
-            error: `Sorry, ${product.name} (${variant.label}) is out of stock.` 
+          return res.status(400).json({
+            error: `Sorry, ${product.name} (${variant.label}) is out of stock.`
           })
         }
         hasPhysicalItems = true
@@ -87,34 +86,6 @@ export default async function handler(req, res) {
       shipping_options: shippingOptions,
       success_url: `https://www.whambamtattoo.com/shop?success=true`,
       cancel_url: `https://www.whambamtattoo.com/shop?cancelled=true`,
-      metadata: {
-        source: 'whambamtattoo.com',
-        items: JSON.stringify(items)
-      }
-    })
-    return res.status(200).json({ url: session.url })
-  } catch (error) {
-    console.error('Stripe error:', error)
-    return res.status(500).json({ error: 'Failed to create checkout session' })
-  }
-}        { shipping_rate: SHIPPING_RATES.international_tracked },
-      ]
-    } else {
-      shippingOptions = [
-        { shipping_rate: SHIPPING_RATES.uk_free },
-        { shipping_rate: SHIPPING_RATES.international },
-      ]
-    }
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
-      line_items: lineItems,
-      mode: 'payment',
-      shipping_address_collection: {
-        allowed_countries: ['GB', 'US', 'CA', 'AU', 'DE', 'FR', 'ES', 'IT', 'NL', 'BE', 'PT', 'SE', 'NO', 'DK', 'FI', 'IE', 'NZ', 'JP'],
-      },
-      shipping_options: shippingOptions,
-      success_url: `https://whambamtattoo.com/shop?success=true`,
-      cancel_url: `https://whambamtattoo.com/shop?cancelled=true`,
       metadata: {
         source: 'whambamtattoo.com',
         items: JSON.stringify(items)
