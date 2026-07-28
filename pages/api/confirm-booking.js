@@ -16,6 +16,19 @@ export default async function handler(req, res) {
     if (error || !booking) {
       return res.status(404).send('Booking not found');
     }
+
+    if (booking.status !== 'requested') {
+      res.setHeader('Content-Type', 'text/html');
+      return res.status(200).send(`
+        <html>
+          <body style="font-family: Arial, sans-serif; text-align: center; padding: 60px;">
+            <h2>This booking has already been confirmed</h2>
+            <p>${booking.full_name} — ${booking.email}</p>
+          </body>
+        </html>
+      `);
+    }
+
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       mode: 'payment',
@@ -53,7 +66,7 @@ export default async function handler(req, res) {
     const emailHtml = `
       <div style="background:#f5f5f5; padding:32px; font-family:Arial, sans-serif;">
         <div style="max-width:640px; margin:0 auto; background:#ffffff; border-radius:16px; padding:28px; border:1px solid #eaeaea;">
-          <h2 style="margin-top:0; color:#111111; text-transform:uppercase;">Your booking is ready to confirm</h2>
+          <h2 style="margin-top:0; color:#111111;">YOUR BOOKING IS READY TO CONFIRM</h2>
           <p style="color:#222222;">Hi ${booking.full_name},</p>
           <p style="color:#222222;">
             Great news — your flash booking request has been approved. To lock in your slot, please pay the £100 deposit using the link below.
