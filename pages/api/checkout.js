@@ -100,8 +100,8 @@ export default async function handler(req, res) {
         allowed_countries: ['GB', 'US', 'CA', 'AU', 'DE', 'FR', 'ES', 'IT', 'NL', 'BE', 'PT', 'SE', 'NO', 'DK', 'FI', 'IE', 'NZ', 'JP'],
       },
       shipping_options: shippingOptions,
-      success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/shop?success=true`,
-      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/shop?cancelled=true`,
+      success_url: `https://whambamtattoo.com/shop?success=true`,
+cancel_url: `https://whambamtattoo.com/shop?cancelled=true`,
       metadata: {
         source: 'whambamtattoo.com',
         items: JSON.stringify(items)
