@@ -53,12 +53,12 @@ export default async function handler(req, res) {
     const emailHtml = `
       <div style="background:#f5f5f5; padding:32px; font-family:Arial, sans-serif;">
         <div style="max-width:640px; margin:0 auto; background:#ffffff; border-radius:16px; padding:28px; border:1px solid #eaeaea;">
-          <h2 style="margin-top:0; color:#111111; font-family:'Bebas Neue', sans-serif; letter-spacing:1px; font-weight:400; font-size:26px;">Your booking is ready to confirm</h2>
+          <h2 style="margin-top:0; color:#111111;">Your booking is ready to confirm</h2>
           <p style="color:#222222;">Hi ${booking.full_name},</p>
           <p style="color:#222222;">
             Great news — your flash booking request has been approved. To lock in your slot, please pay the £100 deposit using the link below.
           </p>
-          <a href="${session.url}" style="display:inline-block; margin-top:12px; background:#000; color:#fff; padding:14px 24px; border-radius:6px; text-decoration:none; font-family:'Bebas Neue', sans-serif; letter-spacing:1px; font-size:18px;">
+          <a href="${session.url}" style="display:inline-block; margin-top:12px; background:#000; color:#fff; padding:14px 24px; border-radius:6px; text-decoration:none; font-weight:bold;">
             Pay £100 deposit
           </a>
           <p style="color:#222222; margin-top:24px;">
