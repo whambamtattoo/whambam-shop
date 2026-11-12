@@ -55,7 +55,7 @@ function emailHtml(name) {
         <p style="${p}">Can I ask you a favour? If you've got a minute, could you leave me a review? That is if you're all happy hahaha</p>
         <p style="margin:0 0 32px;"><a href="${REVIEW_LINK}" style="${redBtn}">LEAVE A REVIEW</a></p>
 
-        <p style="${p} margin-bottom:0;">Hope to see you soon for the next one,<br>Cheers, Andy</p>
+        <p style="${p} margin-bottom:0;">Hope to see you soon for the next one,<br><br>Cheers,<br>Andy</p>
       </div>
     </div>
   `;
