@@ -56,6 +56,14 @@ function emailHtml(name) {
         <p style="margin:0 0 32px;"><a href="${REVIEW_LINK}" style="${redBtn}">LEAVE A REVIEW</a></p>
 
         <p style="${p} margin-bottom:0;">Hope to see you soon for the next one,<br><br>Cheers,<br>Andy</p>
+        <div style="margin-top:6px; color:#000000; font-size:14px; line-height:1.5;">
+          <div style="width:60px; border-top:1px solid #000000; margin:6px 0 10px;"></div>
+          <strong>WHAMBAM TATTOO</strong> - American traditional &amp; script<br>
+          Good Times Tattoo, 1st Floor, 8 Lower Clapton Road, London E5 0PD &middot; 020 7739 2438<br>
+          <a href="https://www.whambamtattoo.com/" style="color:#1a0dab;">WEBSITE</a> &middot;
+          <a href="https://www.instagram.com/whambamtattoo/" style="color:#1a0dab;">INSTAGRAM</a> &middot;
+          <a href="https://www.facebook.com/whambamtattoo/" style="color:#1a0dab;">FACEBOOK</a>
+        </div>
       </div>
     </div>
   `;
