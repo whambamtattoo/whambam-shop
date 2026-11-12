@@ -45,7 +45,6 @@ function emailHtml(name) {
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
     <div style="background:#ffffff; padding:32px 20px; font-family:Arial, Helvetica, sans-serif;">
       <div style="max-width:560px; margin:0 auto;">
-        <div style="font-family:'Bebas Neue', Impact, 'Arial Narrow', sans-serif; font-size:44px; font-weight:700; letter-spacing:1px; line-height:1; color:#000000; margin-bottom:32px;">WHAMBAM TATTOO</div>
 
         <p style="${p}">Hey${name ? ` ${name}` : ''},</p>
         <p style="${p}">Cheers for coming in yesterday, it was a pleasure to tattoo you!!</p>
