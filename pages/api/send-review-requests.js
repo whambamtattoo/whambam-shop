@@ -39,12 +39,13 @@ const AFTERCARE_LINK = 'https://www.whambamtattoo.com/aftercare';
 
 function emailHtml(name) {
   const p = 'margin:0 0 18px; color:#000000; font-size:16px; line-height:1.55;';
-  const btn = "display:inline-block; background:#000000; color:#ffffff; padding:14px 26px; border-radius:8px; text-decoration:none; font-family:'Bebas Neue', Impact, 'Arial Narrow', sans-serif; font-size:22px; letter-spacing:1px;";
+  const btn = "display:inline-block; background:#000000; color:#ffffff; padding:14px 26px; border-radius:8px; text-decoration:none; text-transform:uppercase; font-family:'Bebas Neue', Impact, 'Arial Narrow', sans-serif; font-size:22px; font-weight:700; letter-spacing:1px;";
+  const redBtn = btn.replace('background:#000000', 'background:#C8102E');
   return `
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
     <div style="background:#ffffff; padding:32px 20px; font-family:Arial, Helvetica, sans-serif;">
       <div style="max-width:560px; margin:0 auto;">
-        <div style="font-family:'Bebas Neue', Impact, 'Arial Narrow', sans-serif; font-size:40px; line-height:1; color:#000000; margin-bottom:32px;">WHAMBAM TATTOO</div>
+        <div style="font-family:'Bebas Neue', Impact, 'Arial Narrow', sans-serif; font-size:44px; font-weight:700; letter-spacing:1px; line-height:1; color:#000000; margin-bottom:32px;">WHAMBAM TATTOO</div>
 
         <p style="${p}">Hey${name ? ` ${name}` : ''},</p>
         <p style="${p}">Cheers for coming in yesterday, it was a pleasure to tattoo you!!</p>
@@ -52,7 +53,7 @@ function emailHtml(name) {
         <p style="margin:0 0 32px;"><a href="${AFTERCARE_LINK}" style="${btn}">AFTERCARE</a></p>
 
         <p style="${p}">Can I ask you a favour? If you've got a minute, could you leave me a review? That is if you're all happy hahaha</p>
-        <p style="margin:0 0 32px;"><a href="${REVIEW_LINK}" style="${btn}">LEAVE A REVIEW</a></p>
+        <p style="margin:0 0 32px;"><a href="${REVIEW_LINK}" style="${redBtn}">LEAVE A REVIEW</a></p>
 
         <p style="${p} margin-bottom:0;">Hope to see you soon for the next one,<br>Cheers, Andy</p>
       </div>
