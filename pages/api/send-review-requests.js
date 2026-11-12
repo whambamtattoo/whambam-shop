@@ -48,7 +48,7 @@ function emailHtml(name) {
 
         <p style="${p}">Hey${name ? ` ${name}` : ''},</p>
         <p style="${p}">Cheers for coming in yesterday, it was a pleasure to tattoo you!!</p>
-        <p style="${p}">Just in case you need a little refresher on the aftercare, it's all on my website. Also, any questions while you're healing, just reply to this email. Happy healing!!</p>
+        <p style="${p}">Just in case you need a little refresher on the aftercare, it's all on my website, just click the button below. As well, any questions while you're healing, just reply to this email. Happy healing!!</p>
         <p style="margin:0 0 32px;"><a href="${AFTERCARE_LINK}" style="${btn}">AFTERCARE</a></p>
 
         <p style="${p}">Can I ask you a favour? If you've got a minute, could you leave me a review? That is if you're all happy hahaha</p>
