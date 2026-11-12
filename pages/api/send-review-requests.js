@@ -35,22 +35,26 @@ function clientEmail(event) {
   return guest ? guest.email.toLowerCase() : null;
 }
 
+const AFTERCARE_LINK = 'https://www.whambamtattoo.com/aftercare';
+
 function emailHtml(name) {
+  const p = 'margin:0 0 18px; color:#000000; font-size:16px; line-height:1.55;';
+  const btn = "display:inline-block; background:#000000; color:#ffffff; padding:14px 26px; border-radius:8px; text-decoration:none; font-family:'Bebas Neue', Impact, 'Arial Narrow', sans-serif; font-size:22px; letter-spacing:1px;";
   return `
-    <div style="background:#f5f5f5; padding:32px; font-family:Arial, sans-serif;">
-      <div style="max-width:640px; margin:0 auto; background:#ffffff; border-radius:16px; padding:28px; border:1px solid #eaeaea;">
-        <p style="color:#222222;">Hey${name ? ` ${name}` : ''},</p>
-        <p style="color:#222222;">
-          Thanks for coming in yesterday, it was good to tattoo you. Hope it's healing well.
-          If you've got any questions about aftercare, just reply to this.
-        </p>
-        <p style="color:#222222;">
-          If you've got a minute, a quick Google review would really help me out. It's how most new people find me.
-        </p>
-        <a href="${REVIEW_LINK}" style="display:inline-block; margin-top:8px; background:#000; color:#fff; padding:14px 24px; border-radius:6px; text-decoration:none; font-weight:bold;">
-          Leave a review
-        </a>
-        <p style="margin-top:24px; color:#222222;">Cheers,<br>Andy<br>Whambam Tattoo</p>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+    <div style="background:#ffffff; padding:32px 20px; font-family:Arial, Helvetica, sans-serif;">
+      <div style="max-width:560px; margin:0 auto;">
+        <div style="font-family:'Bebas Neue', Impact, 'Arial Narrow', sans-serif; font-size:40px; line-height:1; color:#000000; margin-bottom:32px;">WHAMBAM TATTOO</div>
+
+        <p style="${p}">Hey${name ? ` ${name}` : ''},</p>
+        <p style="${p}">Cheers for coming in yesterday, it was a pleasure to tattoo you!!</p>
+        <p style="${p}">Just in case you need a little refresher on the aftercare, it's all on my website. Also, any questions while you're healing, just reply to this email. Happy healing!!</p>
+        <p style="margin:0 0 32px;"><a href="${AFTERCARE_LINK}" style="${btn}">AFTERCARE</a></p>
+
+        <p style="${p}">Can I ask you a favour? If you've got a minute, could you leave me a review? That is if you're all happy hahaha</p>
+        <p style="margin:0 0 32px;"><a href="${REVIEW_LINK}" style="${btn}">LEAVE A REVIEW</a></p>
+
+        <p style="${p} margin-bottom:0;">Hope to see you soon for the next one,<br>Cheers, Andy</p>
       </div>
     </div>
   `;
@@ -130,7 +134,7 @@ export default async function handler(req, res) {
         continue;
       }
 
-      await sendEmail({ to, subject: 'Thanks for coming in', html: emailHtml(firstName(title)) });
+      await sendEmail({ to, subject: 'Your new tattoo – aftercare', html: emailHtml(firstName(title)) });
       await supabase.from('review_requests').insert({
         event_id: event.id,
         email: to,
