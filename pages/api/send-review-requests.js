@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { listEvents } from '../../lib/googleCalendar';
 
-// Runs once a day (see vercel.json). Looks at Andy's calendar for appointments
+// Runs once a day (see vercel.json). Looks at the ANDY and GUESTING calendars for appointments
 // that finished in the last day, finds the client's email in the event
 // description, and sends them a thank-you + Google review request.
 // Each event is only ever emailed once (tracked in the review_requests table).
@@ -11,7 +11,12 @@ import { listEvents } from '../../lib/googleCalendar';
 
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SECRET_KEY);
 
-const CALENDAR_ID = process.env.GOOGLE_CALENDAR_ID_ANDY;
+// Only these calendars get review emails. Anything on another calendar
+// (e.g. a moved/rescheduled booking) is ignored.
+const CALENDAR_IDS = [
+  process.env.GOOGLE_CALENDAR_ID_ANDY,
+  process.env.GOOGLE_CALENDAR_ID_GUESTING,
+].filter(Boolean);
 const REVIEW_LINK =
   'https://search.google.com/local/writereview?placeid=ChIJ3beQTsUddkgR7efuYc6gW50';
 
@@ -91,8 +96,8 @@ export default async function handler(req, res) {
   if (!secret || req.headers.authorization !== `Bearer ${secret}`) {
     return res.status(401).json({ error: 'Unauthorised' });
   }
-  if (!CALENDAR_ID) {
-    return res.status(500).json({ error: 'GOOGLE_CALENDAR_ID_ANDY not set' });
+  if (!CALENDAR_IDS.length) {
+    return res.status(500).json({ error: 'GOOGLE_CALENDAR_ID_ANDY / GOOGLE_CALENDAR_ID_GUESTING not set' });
   }
 
   const dryRun = req.query.dryRun === '1';
@@ -104,11 +109,16 @@ export default async function handler(req, res) {
 
   try {
     // Pull a bit wider than the window, then filter on end time.
-    const events = await listEvents(
-      CALENDAR_ID,
-      new Date(windowStart.getTime() - 24 * 3600 * 1000).toISOString(),
-      windowEnd.toISOString()
-    );
+    const events = [];
+    for (const calendarId of CALENDAR_IDS) {
+      events.push(
+        ...(await listEvents(
+          calendarId,
+          new Date(windowStart.getTime() - 24 * 3600 * 1000).toISOString(),
+          windowEnd.toISOString()
+        ))
+      );
+    }
 
     const results = [];
     for (const event of events) {
