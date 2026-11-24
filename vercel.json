@@ -1,5 +1,14 @@
 {
   "crons": [
     { "path": "/api/send-review-requests", "schedule": "0 10 * * *" }
+  ],
+  "headers": [
+    {
+      "source": "/flash/(.*)",
+      "headers": [
+        { "key": "Access-Control-Allow-Origin", "value": "*" },
+        { "key": "Cache-Control", "value": "public, max-age=604800" }
+      ]
+    }
   ]
 }
