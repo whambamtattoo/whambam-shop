@@ -1,5 +1,6 @@
 import Stripe from 'stripe'
 import { createClient } from '@supabase/supabase-js'
+import { products } from '../../lib/products'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SECRET_KEY)
@@ -68,13 +69,17 @@ async function notifyVoucherOrder(session) {
 const BLACK_FRIDAY = { start: Date.UTC(2026, 10, 27, 0, 0), end: Date.UTC(2026, 11, 1, 0, 0) }
 const BF_BONUS = { 50: 60, 100: 125, 150: 185, 200: 250 }
 
-function thankYouHtml({ name, emailedTo, posted, hasTee, voucherLines }) {
+function thankYouHtml({ name, emailedTo, posted, teeLines, voucherLines }) {
   const p = 'margin:0 0 18px; color:#000000; font-size:16px; line-height:1.55;'
   const btn = "display:inline-block; background:#000000; color:#ffffff; padding:14px 0; width:220px; text-align:center; border-radius:8px; text-decoration:none; text-transform:uppercase; font-family:'Bebas Neue', Impact, 'Arial Narrow', sans-serif; font-size:22px; font-weight:700; letter-spacing:1px;"
   const next = []
   if (emailedTo) next.push(`I'll email the voucher over to <strong>${esc(emailedTo)}</strong> myself, usually the same day (I'm in Wednesday to Saturday).`)
   if (posted) next.push(`I'll get the voucher card in the post to you first class, usually the next working day.`)
-  if (hasTee) next.push(`I'll get your tee packed up and posted out to you as soon as I can.`)
+  if (teeLines.length) {
+    const many = teeLines.length > 1 || /^\d+ ×/.test(teeLines[0])
+    const list = teeLines.length > 1 ? `${teeLines.slice(0, -1).join(', ')} and ${teeLines.at(-1)}` : teeLines[0]
+    next.push(`You've ordered ${list}. I'll get ${many ? 'them' : 'it'} packed up and posted out to you as soon as I can.`)
+  }
   return `
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
     <div style="background:#ffffff; padding:32px 20px; font-family:Arial, Helvetica, sans-serif;">
@@ -125,7 +130,15 @@ export function buildThankYou(session) {
     name,
     emailedTo: emailed ? field('send_to') || to : '',
     posted: vouchers.some((v) => v.delivery !== 'email'),
-    hasTee: items.some((i) => !i.variantId?.startsWith('voucher')),
+    teeLines: items
+      .filter((i) => !i.variantId?.startsWith('voucher'))
+      .map((i) => {
+        const product = products.find((p) => p.id === i.productId)
+        const variant = product?.variants.find((v) => v.id === i.variantId)
+        const title = product ? `${i.quantity > 1 ? '' : 'the '}${esc(product.name.replace(/^WHAMBAM\s+/i, 'Whambam '))}${product.color ? ` in ${product.color.toLowerCase()}` : ''}` : 'a tee'
+        const size = variant ? `, size ${esc(variant.label)}` : ''
+        return `${i.quantity > 1 ? `${i.quantity} × ` : ''}<strong>${title}${size}</strong>`
+      }),
     voucherLines,
   })
   return { to, subject: vouchers.length ? 'Cheers for your gift voucher order!' : 'Cheers for your order!', html }
