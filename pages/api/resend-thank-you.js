@@ -2,14 +2,14 @@ import Stripe from 'stripe'
 import { buildThankYou } from './webhook'
 
 // One-off: send the shop thank-you email for an order that came in before the
-// automatic email existed. POST { email } — finds that buyer's paid shop orders
+// automatic email existed. POST { email } or GET ?email= — finds that buyer's paid shop orders
 // from the last 7 days in Stripe and emails the buyer (only ever to their own
 // checkout email, and only once per order).
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
 
 export default async function handler(req, res) {
-  if (req.method !== 'POST') return res.status(405).end()
-  const email = String(req.body?.email || '').trim().toLowerCase()
+  if (!['POST', 'GET'].includes(req.method)) return res.status(405).end()
+  const email = String(req.body?.email || req.query.email || '').trim().toLowerCase()
   if (!email) return res.status(400).json({ error: 'email needed' })
 
   const since = Math.floor(Date.now() / 1000) - 7 * 24 * 3600
