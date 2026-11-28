@@ -154,6 +154,7 @@ async function sendThankYou(session) {
     body: JSON.stringify({ from: process.env.FROM_EMAIL, ...email, reply_to: process.env.NOTIFICATION_EMAIL || undefined }),
   })
   if (!res.ok) throw new Error(`Resend error ${res.status}: ${await res.text()}`)
+  await stripe.checkout.sessions.update(session.id, { metadata: { ...session.metadata, thank_you_sent: '1' } }).catch(() => {})
 }
 
 export default async function handler(req, res) {
