@@ -71,7 +71,7 @@ const BF_BONUS = { 50: 60, 100: 125, 150: 185, 200: 250 }
 
 function thankYouHtml({ name, emailedTo, posted, teeLines, voucherLines }) {
   const p = 'margin:0 0 18px; color:#000000; font-size:16px; line-height:1.55;'
-  const btn = "display:inline-block; background:#000000; color:#ffffff; padding:14px 0; width:220px; text-align:center; border-radius:8px; text-decoration:none; text-transform:uppercase; font-family:'Bebas Neue', Impact, 'Arial Narrow', sans-serif; font-size:22px; font-weight:700; letter-spacing:1px;"
+  const btn = "display:inline-block; background:#000000; color:#ffffff; padding:14px 0; width:250px; text-align:center; border-radius:8px; text-decoration:none; text-transform:uppercase; font-family:'Bebas Neue', Impact, 'Arial Narrow', sans-serif; font-size:22px; font-weight:700; letter-spacing:1px;"
   const next = []
   if (emailedTo) next.push(`I'll email the voucher over to <strong>${esc(emailedTo)}</strong> myself, usually the same day (I'm in Wednesday to Saturday).`)
   if (posted) next.push(`I'll get the voucher card in the post to you first class, usually the next working day.`)
@@ -89,7 +89,7 @@ function thankYouHtml({ name, emailedTo, posted, teeLines, voucherLines }) {
         ${voucherLines ? `<p style="${p}">${voucherLines}</p>` : ''}
         ${next.map((t) => `<p style="${p}">${t}</p>`).join('')}
         ${voucherLines ? `<p style="${p}">Vouchers are good for 12 months and can go towards any tattoo with me, flash or custom. When whoever's got it is ready, they can book a flash design or send me an enquiry on the website.</p>
-        <p style="margin:0 0 32px;"><a href="https://www.whambamtattoo.com/flash-tattoos-london" style="${btn}">SEE THE FLASH</a></p>` : ''}
+        <p style="margin:0 0 32px;"><a href="https://www.whambamtattoo.com/flash-tattoos-london" style="${btn} margin:0 8px 10px 0;">SEE THE FLASH</a><a href="https://www.whambamtattoo.com/#inquiries" style="${btn.replace('background:#000000', 'background:#990000')} margin:0 0 10px 0;">SEND AN ENQUIRY</a></p>` : ''}
         <p style="${p}">Any questions, just reply to this email.</p>
         <p style="${p} margin-bottom:0;">Cheers,<br>Andy</p>
         <div style="margin-top:6px; color:#000000; font-size:14px; line-height:1.5;">
